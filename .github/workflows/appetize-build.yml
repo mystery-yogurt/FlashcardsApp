@@ -6,12 +6,18 @@ on:
 
 jobs:
   build:
-    name: Build iOS Simulator App
-    runs-on: macos-14 # Используем свежую macOS для сборки
+    name: Build iOS App
+    runs-on: macos-14 # Сервер Apple от GitHub
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4 # ОБНОВЛЕНО ДО v4
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
 
       - name: Select Xcode Version
         run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
@@ -31,7 +37,7 @@ jobs:
           zip -r FlashcardsApp.zip FlashcardsApp.app
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4 # ОБНОВЛЕНО ДО v4
+        uses: actions/upload-artifact@v4
         with:
           name: FlashcardsApp-Simulator-Build
           path: ${{ github.workspace }}/build/FlashcardsApp.zip
