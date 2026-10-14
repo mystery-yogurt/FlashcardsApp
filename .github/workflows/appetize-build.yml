@@ -1,0 +1,39 @@
+name: Build for Appetize.io
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Build iOS Simulator App
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build for iOS Simulator
+        run: |
+          xcodebuild build \
+            -project FlashcardsApp.xcodeproj \
+            -scheme FlashcardsApp \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            CONFIGURATION_BUILD_DIR=${{ github.workspace }}/build
+
+      - name: Zip the .app file
+        run: |
+          cd ${{ github.workspace }}/build
+          zip -r FlashcardsApp.zip FlashcardsApp.app
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: FlashcardsApp-Simulator-Build
+          path: ${{ github.workspace }}/build/FlashcardsApp.zip
