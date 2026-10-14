@@ -23,19 +23,25 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
 
       - name: Build for iOS Simulator
-        # Добавлено ONLY_ACTIVE_ARCH=NO для поддержки всех серверов Appetize
+        # Собираем под generic симулятор и принудительно для всех архитектур
         run: |
           xcodebuild build \
             -project FlashcardsApp.xcodeproj \
             -scheme FlashcardsApp \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -destination 'generic/platform=iOS Simulator' \
+            ARCHS="x86_64 arm64" \
             ONLY_ACTIVE_ARCH=NO \
             CONFIGURATION_BUILD_DIR=${{ github.workspace }}/build
+
+      - name: Prepare Payload for Appetize
+        # Копируем .app в отдельную папку, чтобы GitHub правильно ее запаковал
+        run: |
+          mkdir -p ${{ github.workspace }}/Payload
+          cp -R ${{ github.workspace }}/build/FlashcardsApp.app ${{ github.workspace }}/Payload/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FlashcardsApp # Это будет название скачанного ZIP архива
-          # Мы указываем сразу на папку .app, GitHub сам её запакует правильно!
-          path: ${{ github.workspace }}/build/FlashcardsApp.app
+          name: FlashcardsApp
+          path: ${{ github.workspace }}/Payload/
