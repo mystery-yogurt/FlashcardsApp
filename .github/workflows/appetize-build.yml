@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: Build iOS App
-    runs-on: macos-14 # Сервер Apple от GitHub
+    runs-on: macos-14
 
     steps:
       - name: Checkout repository
@@ -23,21 +23,19 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
 
       - name: Build for iOS Simulator
+        # Добавлено ONLY_ACTIVE_ARCH=NO для поддержки всех серверов Appetize
         run: |
           xcodebuild build \
             -project FlashcardsApp.xcodeproj \
             -scheme FlashcardsApp \
             -sdk iphonesimulator \
             -destination 'platform=iOS Simulator,name=iPhone 15' \
+            ONLY_ACTIVE_ARCH=NO \
             CONFIGURATION_BUILD_DIR=${{ github.workspace }}/build
-
-      - name: Zip the .app file
-        run: |
-          cd ${{ github.workspace }}/build
-          zip -r FlashcardsApp.zip FlashcardsApp.app
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FlashcardsApp-Simulator-Build
-          path: ${{ github.workspace }}/build/FlashcardsApp.zip
+          name: FlashcardsApp # Это будет название скачанного ZIP архива
+          # Мы указываем сразу на папку .app, GitHub сам её запакует правильно!
+          path: ${{ github.workspace }}/build/FlashcardsApp.app
