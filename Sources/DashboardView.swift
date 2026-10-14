@@ -4,12 +4,21 @@ import Charts
 struct DashboardView: View {
     @StateObject private var viewModel = DashboardViewModel()
     
+    // Моковые данные для запуска сессии
+    let sampleCard = Flashcard(
+        word: "Swift",
+        transcription: "swɪft",
+        translation: "Стриж / Быстрый",
+        example: "Apple introduced the Swift programming language in 2014.",
+        memorizationLevel: 0.6
+    )
+    
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 24) {
                     
-                    // Блок статистики (Swift Charts)
+                    // Блок статистики
                     VStack(alignment: .leading) {
                         Text("Статистика за неделю")
                             .font(.headline)
@@ -56,10 +65,8 @@ struct DashboardView: View {
                         }
                     }
                     
-                    // Кнопка
-                    Button(action: {
-                        viewModel.startRepetitionSession()
-                    }) {
+                    // Кнопка перехода к Флэш-карточкам (NavigationLink)
+                    NavigationLink(destination: FlashcardView(viewModel: FlashcardViewModel(card: sampleCard))) {
                         Text("Начать повторение")
                             .font(.headline)
                             .foregroundColor(.white)
@@ -76,6 +83,15 @@ struct DashboardView: View {
                 .padding(.vertical)
             }
             .navigationTitle("Тренажер слов")
+            // Кнопка перехода к Сканеру (Камере)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink(destination: ScannerView()) {
+                        Image(systemName: "camera.viewfinder")
+                            .font(.title3)
+                    }
+                }
+            }
         }
     }
 }
