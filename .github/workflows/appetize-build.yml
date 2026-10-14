@@ -22,8 +22,10 @@ jobs:
       - name: Select Xcode Version
         run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
 
+      - name: Resolve Swift Packages
+        run: xcodebuild -resolvePackageDependencies -project FlashcardsApp.xcodeproj -scheme FlashcardsApp
+
       - name: Build for iOS Simulator
-        # Собираем под generic симулятор и принудительно для всех архитектур
         run: |
           xcodebuild build \
             -project FlashcardsApp.xcodeproj \
@@ -32,10 +34,10 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             ARCHS="x86_64 arm64" \
             ONLY_ACTIVE_ARCH=NO \
+            -skipMacroValidation \
             CONFIGURATION_BUILD_DIR=${{ github.workspace }}/build
 
       - name: Prepare Payload for Appetize
-        # Копируем .app в отдельную папку, чтобы GitHub правильно ее запаковал
         run: |
           mkdir -p ${{ github.workspace }}/Payload
           cp -R ${{ github.workspace }}/build/FlashcardsApp.app ${{ github.workspace }}/Payload/
