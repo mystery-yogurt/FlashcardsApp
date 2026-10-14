@@ -1,12 +1,19 @@
 name: FlashcardsApp
 options:
   bundleIdPrefix: com.example
+packages:
+  Realm:
+    url: https://github.com/realm/realm-swift.git
+    from: 10.45.0
 targets:
   FlashcardsApp:
     type: application
     platform: iOS
-    deploymentTarget: "16.0"
+    deploymentTarget: "17.0"
     sources: [Sources]
+    dependencies:
+      - package: Realm
+        product: RealmSwift
     settings:
       base:
         GENERATE_INFOPLIST_FILE: "YES"
